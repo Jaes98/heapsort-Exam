@@ -25,16 +25,20 @@ function start() {
   });
 
   // TODO display as tree/heap
-  //   displayArrayAsBars(arr, "arrayDisplay");
+  displayArrayAsBars(arr, "arrayDisplay");
   //   displayArrayAsBoxes(countArr, "countingArrayDisplay");
   //   displayIndexLabels(countArr.length, "countingArrayIndexDisplay");
   //   displayArrayAsBoxes(arr, "originalArrayDisplay");
 }
 
-function heapSort(array) {
+async function heapSort(array) {
   let size = array.length;
 
-  for (let i = Math.floor(size / 2 - 1); i >= 0; i--) heapify(array, size, i);
+  for (let i = Math.floor(size / 2 - 1); i >= 0; i--) {
+    heapify(array, size, i);
+    visualizeStep(array, `Heapify at index ${i}`, "heapify", i);
+    await delayDuration(delayValue);
+  }
 
   // set the last element as the largest element
   for (let i = size - 1; i >= 0; i--) {
@@ -45,7 +49,13 @@ function heapSort(array) {
     // set the last element as the largest
     array[i] = temp;
     // i = size of the array, 0 = root node
+    visualizeStep(array, `Swap root node with last element`, "swap", i);
+    await delayDuration(delayValue);
+
     heapify(array, i, 0);
+
+    visualizeStep(array, `Heapify root ${i}`, "heapify", i);
+    await delayDuration(delayValue);
   }
 }
 
@@ -91,7 +101,7 @@ function handleArrayInput() {
   clearDisplays();
 
   // TODO: display as tree/heap
-  //   displayArrayAsBars(newArray, "arrayDisplay");
+  displayArrayAsBars(newArray, "arrayDisplay");
   //   displayArrayAsBoxes(countArr, "countingArrayDisplay");
   //   displayIndexLabels(countArr.length, "countingArrayIndexDisplay");
   //   displayArrayAsBoxes(newArray, "originalArrayDisplay");
@@ -125,6 +135,8 @@ function delayDuration(ms) {
 function visualizeStep(array, message, type, highlightIndex) {
   if (resetFlag) return;
 
+  displayArrayAsBars(array, "arrayDisplay");
+  displayAsTree(array, "treeDisplay");
   //   if (type === "counting") {
   //     displayArrayAsBoxes(array, "countingArrayDisplay", highlightIndex);
   //     displayIndexLabels(array.length, "countingArrayIndexDisplay");
@@ -144,4 +156,37 @@ function clearContainer(containerId) {
   return clearedContainer;
 }
 
-function displayAsTree() {}
+function clearDisplays() {
+  document.getElementById("arrayDisplay").innerHTML = "";
+  document.getElementById("steps").innerHTML = "";
+}
+
+// function displayAsBars(array, containerId) {
+//   const container = document.getElementById(containerId);
+//   container.innerHTML = "";
+
+//   array.forEach((value) => {
+//     const bar = document.createElement("div");
+//     bar.classList.add("bar");
+//     bar.style.height = `${value * 20}px`; // Adjust the scaling as needed
+//     container.appendChild(bar);
+//   });
+// }
+
+function displayArrayAsBars(array, containerId, highlightIndex) {
+  const barContainer = clearContainer(containerId);
+
+  array.forEach((value, index) => {
+    const bar = document.createElement("div");
+    bar.classList.add("bar");
+    bar.style.height = `${value * 20}px`;
+    bar.style.backgroundColor = index === highlightIndex ? "#FF4949" : "#2e63e9";
+
+    const label = document.createElement("label");
+    label.classList.add("bar-label");
+    label.innerHTML = value;
+    bar.appendChild(label);
+
+    barContainer.appendChild(bar);
+  });
+}
