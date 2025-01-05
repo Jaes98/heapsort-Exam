@@ -1,6 +1,6 @@
 window.addEventListener("load", start);
 
-const array = [1, 4, 1, 2, 7, 5, 2, 4, 8];
+const array = [3, 5, 12, 5, 6, 11, 8, 10, 13, 2];
 const originalArray = [...array];
 let delayValue = document.getElementById("speedSlider").value;
 
@@ -29,119 +29,78 @@ function start() {
 
   // TODO display as tree/heap
   displayArrayAsBars(array, "arrayDisplay");
-  displayIndexLabels(countArr.length, "indexCounterDisplay");
+  // displayIndexLabels(countArr.length, "indexCounterDisplay");
   displayArrayAsBoxes(array, "originalArrayDisplay");
 }
 
-// async function heapSort(array) {
-//   let size = array.length;
-//   console.log(size);
-
-//   console.log("Heap sort started");
-
-//   for (let i = Math.floor(size / 2 - 1); i >= 0; i--) {
-//     heapify(array, size, i);
-//     visualizeStep(array, `Heapify at index ${i}`, "heapify", i);
-//     await delayDuration(delayValue);
-//   }
-
-//   // set the last element as the largest element
-//   for (let i = size - 1; i >= 0; i--) {
-//     // temp to store the first element which is the largest element
-//     let temp = array[0];
-//     // set the first element as the last element
-//     array[0] = array[i];
-//     // set the last element as the largest
-//     array[i] = temp;
-//     // i = size of the array, 0 = root node
-//     visualizeStep(array, `Swap root node with last element`, "swap", i);
-//     await delayDuration(delayValue);
-
-//     heapify(array, i, 0);
-
-//     visualizeStep(array, `Heapify root ${i}`, "heapify", i);
-//     await delayDuration(delayValue);
-//   }
-// }
-
 async function heapSort(array) {
   resetFlag = false;
-
   let size = array.length;
-  console.log(size);
-
-  console.log("Heap sort started");
 
   for (let i = Math.floor(size / 2 - 1); i >= 0; i--) {
     if (resetFlag) return;
 
-    visualizeStep(array, `Heapify at index ${i}`, "heapify", [i]);
-    heapify(array, size, i);
+    visualizeStep(array, `Building heap at index [${i}]`, "heapify", [i]);
     await delayDuration(delayValue);
+    await heapify(array, size, i);
   }
 
+  // set the last element as the largest element
   for (let i = size - 1; i >= 0; i--) {
+    // temp to store the first element which is the largest element
     let temp = array[0];
+    // set the first element as the last element
     array[0] = array[i];
+    // set the last element as the largest
     array[i] = temp;
-    visualizeStep(array, `Swapped parent index 0 [root node] with child index ${i}.`, "swap", [0, i]);
+
+    visualizeStep(array, `Swapped parent at index [0] with child index at index [${i}].`, "swap", [0, i]);
     await delayDuration(delayValue);
 
-    visualizeStep(array, `Heapify root ${i}`, "heapify", [0, 2 * 0 + 1, 2 * 0 + 2]);
-    heapify(array, i, 0);
+    visualizeStep(array, `Heapifying root at index [${i}]`, "heapify", [0, 2 * 0 + 1, 2 * 0 + 2]);
     await delayDuration(delayValue);
+
+    // i = size of the array, 0 = root node
+    await heapify(array, i, 0);
   }
+
+  displayArrayAsBars(array, "arrayDisplay");
 }
 
-// function heapify(array, size, i) {
-//   // max = 0, root node
-//   let max = i;
-//   let left = 2 * i + 1;
-//   let right = 2 * i + 2;
-
-//   // if left child is greater than root, set left as max
-//   if (left < size && array[left] > array[max]) max = left;
-
-//   // if right child is greater than root, set right as max
-//   if (right < size && array[right] > array[max]) max = right;
-
-//   // if max is not root, swap root with max
-//   if (max != i) {
-//     // temp = root
-//     let temp = array[i];
-//     // set last element = max
-//     array[i] = array[max];
-//     // set max to root
-//     array[max] = temp;
-
-//     // recursively heapify the affected sub-tree because the root has been changed
-//     heapify(array, size, max);
-//   }
-// }
-
-function heapify(array, size, i) {
+async function heapify(array, size, i) {
+  // max = 0, root node
   let max = i;
   let left = 2 * i + 1;
   let right = 2 * i + 2;
 
+  // if left child is greater than root, set left as max
   if (left < size && array[left] > array[max]) {
     max = left;
-    visualizeStep(array, `Left child ${left} is greater than parent ${i}.`, "compare", [left]);
+    visualizeStep(array, `Left child at index [${left}] is greater than parent at index [${i}].`, "compare", [left, i]);
+    await delayDuration(delayValue);
   }
 
+  // if right child is greater than root, set right as max
   if (right < size && array[right] > array[max]) {
     max = right;
-    visualizeStep(array, `Right child ${right} is greater than parent ${i}.`, "compare", [right]);
+    visualizeStep(array, `Right child at index [${right}] is greater than parent at index [${i}].`, "compare", [right, i]);
+    await delayDuration(delayValue);
   }
 
+  // if max is not root, swap root with max
   if (max != i) {
+    // temp = root
     let temp = array[i];
+    // set last element = max
     array[i] = array[max];
+    // set max to root
     array[max] = temp;
 
-    visualizeStep(array, `Swapped parent index ${i} with child index ${max}.`, "swap", [i, max]);
+    visualizeStep(array, `Swapped parent at index [${i}] with child at index [${max}].`, "swap", [i, max]);
+    await delayDuration(delayValue);
 
-    heapify(array, size, max);
+    // recursively heapify the affected sub-tree because the root has been changed
+    await heapify(array, size, max);
   }
 }
 
@@ -188,10 +147,7 @@ function handleResetClicked() {
 
   clearDisplays();
 
-  // TODO: display as tree/heap
   displayArrayAsBars(originalArray, "arrayDisplay");
-  //   displayArrayAsBoxes(countArr, "countingArrayDisplay");
-  //   displayIndexLabels(countArr.length, "countingArrayIndexDisplay");
 }
 
 function delayDuration(ms) {
@@ -199,15 +155,13 @@ function delayDuration(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function visualizeStep(array, message, type, highlightIndices = []) {
+function visualizeStep(array, message, type, highlightIndex = []) {
   if (resetFlag) return;
 
-  displayArrayAsBars(array, "arrayDisplay", highlightIndices, type);
-  if (type === "heapify" || type === "swap") {
-    displayIndexLabels(array.length, "indexCounterDisplay");
-  }
-
+  displayArrayAsBars(array, "arrayDisplay", highlightIndex, type);
   document.getElementById("stepsTaken").innerHTML = message;
+
+  console.log(message);
 }
 
 function clearContainer(containerId) {
@@ -233,7 +187,7 @@ function clearDisplays() {
 //   });
 // }
 
-function displayArrayAsBars(array, containerId, highlightIndices = [], type = null) {
+function displayArrayAsBars(array, containerId, highlightIndex = [], type = null) {
   const barContainer = clearContainer(containerId);
 
   array.forEach((value, index) => {
@@ -241,15 +195,16 @@ function displayArrayAsBars(array, containerId, highlightIndices = [], type = nu
     bar.classList.add("bar");
     bar.style.height = `${value * 20}px`;
 
-    if (highlightIndices.includes(index)) {
+    if (highlightIndex.includes(index)) {
       let color = "#FF4949"; // Default highlight color
 
       if (type === "swap") {
         // Assign red to the first index and green to the second index being swapped
-        const swapIndex = highlightIndices.indexOf(index);
+        const swapIndex = highlightIndex.indexOf(index);
         color = swapIndex === 0 ? "#FF4949" : "#00FF00"; // Red and Green
       } else if (type === "compare") {
-        color = "#0000FF"; // Blue for comparison
+        const compareIndex = highlightIndex.indexOf(index);
+        color = compareIndex === 0 ? "#ff8000" : "#FFD700"; // Orange and Gold
       }
 
       bar.style.backgroundColor = color;
@@ -261,6 +216,11 @@ function displayArrayAsBars(array, containerId, highlightIndices = [], type = nu
     label.classList.add("bar-label");
     label.innerHTML = value;
     bar.appendChild(label);
+
+    const indexLabel = document.createElement("label");
+    indexLabel.classList.add("bar-index-label");
+    indexLabel.innerHTML = index;
+    bar.appendChild(indexLabel);
 
     barContainer.appendChild(bar);
   });
@@ -288,8 +248,10 @@ function displayIndexLabels(length, containerId) {
 
   for (let i = 0; i < length; i++) {
     const indexLabel = document.createElement("div");
+
     indexLabel.classList.add("index-label");
     indexLabel.innerHTML = i;
+
     indexContainer.appendChild(indexLabel);
   }
 }
