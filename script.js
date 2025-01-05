@@ -4,7 +4,6 @@ const array = [3, 5, 12, 5, 6, 11, 8, 10, 13, 2];
 const originalArray = [...array];
 const max = Math.max(...array);
 
-// Speedslider delay
 let delayValue = document.getElementById("speedSlider").value;
 
 // Reset flag to stop the sorting algorithm
@@ -42,7 +41,7 @@ function start() {
 }
 
 async function heapSort(array) {
-  if (isPaused) await pauseExecution();
+  if (isPaused) await pauseProcess();
   resetFlag = false;
 
   let size = array.length;
@@ -57,11 +56,11 @@ async function heapSort(array) {
 
   // set the last element as the largest element
   for (let i = size - 1; i >= 0; i--) {
-    // temp to store the first element which is the largest element
+    // temp variable to store the first element which is the largest element
     let temp = array[0];
-    // set the first element as the last element
+    // set the root element to point to the last element
     array[0] = array[i];
-    // set the last element as the largest
+    // set the last element as the largest to be placed at the end of the array
     array[i] = temp;
 
     visualizeStep(array, `Swapped parent at index [0] with child at index [${i}].`, "swap", [0, i]);
@@ -78,7 +77,7 @@ async function heapSort(array) {
 }
 
 async function heapify(array, size, i) {
-  if (isPaused) await pauseExecution();
+  if (isPaused) await pauseProcess();
 
   // max = 0, root node
   let max = i;
@@ -101,11 +100,11 @@ async function heapify(array, size, i) {
 
   // if max is not root, swap root with max
   if (max != i) {
-    // temp = root
+    // set temp to root
     let temp = array[i];
-    // set last element = max
+    // moves the largest element to the root
     array[i] = array[max];
-    // set max to root
+    // moves the original root to the largest element's previous position
     array[max] = temp;
 
     visualizeStep(array, `Swapped parent at index [${i}] with child at index [${max}].`, "swap", [i, max]);
@@ -163,10 +162,12 @@ function handleResetClicked() {
 
 function delayDuration(ms) {
   // Delays the sorting algorithm based on ms value
+  // Uses a promise to allow pausing the sorting algorithm by waiting for the promise to resolve
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function pauseExecution() {
+function pauseProcess() {
+  // Uses a promise to pause the sorting algorithm until the resume button is clicked
   return new Promise((resolve) => {
     resumeFunction = resolve;
   });
@@ -174,7 +175,7 @@ function pauseExecution() {
 
 async function visualizeStep(array, message, type, highlightIndex = []) {
   if (resetFlag) return;
-  if (isPaused) await pauseExecution();
+  if (isPaused) await pauseProcess();
 
   displayArrayAsBars(array, "arrayDisplay", highlightIndex, type);
   document.getElementById("stepsTaken").innerHTML = message;
