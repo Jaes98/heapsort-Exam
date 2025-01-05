@@ -207,7 +207,7 @@ function displayArrayAsBars(array, containerId, highlightIndex = [], type = null
       let color = "#FF4949"; // Default highlight color
 
       if (type === "swap") {
-        // Assign red to the first index and green to the second index being swapped
+        // Assign colors to the index being swapped
         const swapIndex = highlightIndex.indexOf(index);
         color = swapIndex === 0 ? "#FF4949" : "#00FF00"; // Red and Green
       } else if (type === "compare") {
