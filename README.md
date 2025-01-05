@@ -2,7 +2,9 @@
 
 Heapsort visualisering til eksamen
 
+<div align="center">
 ![Alt Text](./assets/DSA%20Eksamen%20Screenshot.png)
+</div>
 
 - **GitHub:** [https://github.com/Jaes98/heapsort-Exam](https://github.com/Jaes98/heapsort-Exam)
 - **GitHub Pages:** [https://jaes98.github.io/heapsort-Exam/](https://jaes98.github.io/heapsort-Exam/)
