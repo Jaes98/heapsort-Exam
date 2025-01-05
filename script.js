@@ -9,17 +9,25 @@ let countArr = Array(max + 1).fill(0);
 
 let resetFlag = false;
 
+let isPaused = false;
+let resumePromise;
+let resumeFunction;
+
 function start() {
   console.log("JS running");
 
   const submitArrayButton = document.getElementById("submitArrayButton");
   const startButton = document.getElementById("start_button");
+  const pause_button = document.getElementById("pause_button");
+  const resume_button = document.getElementById("resume_button");
   const resetButton = document.getElementById("reset_button");
   const speedSlider = document.getElementById("speedSlider");
   const speedValue = document.getElementById("speedValue");
 
   submitArrayButton.addEventListener("click", handleArrayInput);
   startButton.addEventListener("click", handleStartClicked);
+  pause_button.addEventListener("click", handlePauseClicked);
+  resume_button.addEventListener("click", handleResumeClicked);
   resetButton.addEventListener("click", handleResetClicked);
 
   speedSlider.addEventListener("input", function () {
@@ -29,14 +37,14 @@ function start() {
     speedValue.textContent = `Animation speed (ms): ${delayValue}`;
   });
 
-  // TODO display as tree/heap
   displayArrayAsBars(array, "arrayDisplay");
-  // displayIndexLabels(countArr.length, "indexCounterDisplay");
   displayArrayAsBoxes(array, "originalArrayDisplay");
 }
 
 async function heapSort(array) {
+  if (isPaused) await pauseExecution();
   resetFlag = false;
+
   let size = array.length;
 
   for (let i = Math.floor(size / 2 - 1); i >= 0; i--) {
@@ -70,6 +78,8 @@ async function heapSort(array) {
 }
 
 async function heapify(array, size, i) {
+  if (isPaused) await pauseExecution();
+
   // max = 0, root node
   let max = i;
   let left = 2 * i + 1;
@@ -125,23 +135,32 @@ function handleArrayInput() {
 
   clearDisplays();
 
-  // TODO: display as tree/heap
   displayArrayAsBars(newArray, "arrayDisplay");
-  //   displayArrayAsBoxes(countArr, "countingArrayDisplay");
-  //   displayIndexLabels(countArr.length, "countingArrayIndexDisplay");
-  //   displayArrayAsBoxes(newArray, "originalArrayDisplay");
 }
 
 console.log(array);
 
 async function handleStartClicked() {
   console.log(array);
-
+  document.getElementById("status").innerHTML = "Program status: Running";
   await heapSort(array);
+}
+
+function handlePauseClicked() {
+  isPaused = true;
+  document.getElementById("status").innerHTML = "Program status: Paused";
+}
+
+function handleResumeClicked() {
+  isPaused = false;
+  document.getElementById("status").innerHTML = "Program status: Running";
+  resumeFunction();
 }
 
 function handleResetClicked() {
   resetFlag = true;
+
+  document.getElementById("status").innerHTML = "Program status: Not running";
 
   array.splice(0, array.length, ...originalArray);
 
@@ -155,6 +174,12 @@ function handleResetClicked() {
 function delayDuration(ms) {
   // Delays the sorting algorithm based on ms value
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function pauseExecution() {
+  return new Promise((resolve) => {
+    resumeFunction = resolve;
+  });
 }
 
 function visualizeStep(array, message, type, highlightIndex = []) {
@@ -176,18 +201,6 @@ function clearDisplays() {
   document.getElementById("arrayDisplay").innerHTML = "";
   document.getElementById("stepsTaken").innerHTML = "";
 }
-
-// function displayAsBars(array, containerId) {
-//   const container = document.getElementById(containerId);
-//   container.innerHTML = "";
-
-//   array.forEach((value) => {
-//     const bar = document.createElement("div");
-//     bar.classList.add("bar");
-//     bar.style.height = `${value * 20}px`; // Adjust the scaling as needed
-//     container.appendChild(bar);
-//   });
-// }
 
 function displayArrayAsBars(array, containerId, highlightIndex = [], type = null) {
   const barContainer = clearContainer(containerId);
