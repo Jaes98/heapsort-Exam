@@ -1,8 +1,11 @@
 window.addEventListener("load", start);
 
-const arr = [1, 4, 1, 2, 7, 5, 2, 4, 8];
-const originalArray = [...arr];
+const array = [1, 4, 1, 2, 7, 5, 2, 4, 8];
+const originalArray = [...array];
 let delayValue = document.getElementById("speedSlider").value;
+
+const max = Math.max(...array);
+let countArr = Array(max + 1).fill(0);
 
 let resetFlag = false;
 
@@ -25,64 +28,121 @@ function start() {
   });
 
   // TODO display as tree/heap
-  displayArrayAsBars(arr, "arrayDisplay");
-  //   displayArrayAsBoxes(countArr, "countingArrayDisplay");
-  //   displayIndexLabels(countArr.length, "countingArrayIndexDisplay");
-  //   displayArrayAsBoxes(arr, "originalArrayDisplay");
+  displayArrayAsBars(array, "arrayDisplay");
+  displayIndexLabels(countArr.length, "indexCounterDisplay");
+  displayArrayAsBoxes(array, "originalArrayDisplay");
 }
+
+// async function heapSort(array) {
+//   let size = array.length;
+//   console.log(size);
+
+//   console.log("Heap sort started");
+
+//   for (let i = Math.floor(size / 2 - 1); i >= 0; i--) {
+//     heapify(array, size, i);
+//     visualizeStep(array, `Heapify at index ${i}`, "heapify", i);
+//     await delayDuration(delayValue);
+//   }
+
+//   // set the last element as the largest element
+//   for (let i = size - 1; i >= 0; i--) {
+//     // temp to store the first element which is the largest element
+//     let temp = array[0];
+//     // set the first element as the last element
+//     array[0] = array[i];
+//     // set the last element as the largest
+//     array[i] = temp;
+//     // i = size of the array, 0 = root node
+//     visualizeStep(array, `Swap root node with last element`, "swap", i);
+//     await delayDuration(delayValue);
+
+//     heapify(array, i, 0);
+
+//     visualizeStep(array, `Heapify root ${i}`, "heapify", i);
+//     await delayDuration(delayValue);
+//   }
+// }
 
 async function heapSort(array) {
   let size = array.length;
+  console.log(size);
+
+  console.log("Heap sort started");
 
   for (let i = Math.floor(size / 2 - 1); i >= 0; i--) {
+    visualizeStep(array, `Heapify at index ${i}`, "heapify", i, formatParentChild(i, 2 * i + 1), formatParentChild(i, 2 * i + 2));
     heapify(array, size, i);
-    visualizeStep(array, `Heapify at index ${i}`, "heapify", i);
     await delayDuration(delayValue);
   }
 
-  // set the last element as the largest element
   for (let i = size - 1; i >= 0; i--) {
-    // temp to store the first element which is the largest element
     let temp = array[0];
-    // set the first element as the last element
     array[0] = array[i];
-    // set the last element as the largest
     array[i] = temp;
-    // i = size of the array, 0 = root node
-    visualizeStep(array, `Swap root node with last element`, "swap", i);
+    visualizeStep(array, `Swapped parent index 0 [root node] with child index ${i}.`, "swap", i);
     await delayDuration(delayValue);
 
+    visualizeStep(array, `Heapify root ${i}`, "heapify", i, formatParentChild(0, 2 * 0 + 1), formatParentChild(0, 2 * 0 + 2));
     heapify(array, i, 0);
-
-    visualizeStep(array, `Heapify root ${i}`, "heapify", i);
     await delayDuration(delayValue);
   }
 }
 
+// function heapify(array, size, i) {
+//   // max = 0, root node
+//   let max = i;
+//   let left = 2 * i + 1;
+//   let right = 2 * i + 2;
+
+//   // if left child is greater than root, set left as max
+//   if (left < size && array[left] > array[max]) max = left;
+
+//   // if right child is greater than root, set right as max
+//   if (right < size && array[right] > array[max]) max = right;
+
+//   // if max is not root, swap root with max
+//   if (max != i) {
+//     // temp = root
+//     let temp = array[i];
+//     // set last element = max
+//     array[i] = array[max];
+//     // set max to root
+//     array[max] = temp;
+
+//     // recursively heapify the affected sub-tree because the root has been changed
+//     heapify(array, size, max);
+//   }
+// }
+
 function heapify(array, size, i) {
-  // max = 0, root node
   let max = i;
   let left = 2 * i + 1;
   let right = 2 * i + 2;
 
-  // if left child is greater than root, set left as max
-  if (left < size && array[left] > array[max]) max = left;
+  if (left < size && array[left] > array[max]) {
+    max = left;
+    visualizeStep(array, `Left child ${left} is greater than parent ${i}.`, "compare", left);
+  }
 
-  // if right child is greater than root, set right as max
-  if (right < size && array[right] > array[max]) max = right;
+  if (right < size && array[right] > array[max]) {
+    max = right;
+    visualizeStep(array, `Right child ${right} is greater than parent ${i}.`, "compare", right);
+  }
 
-  // if max is not root, swap root with max
   if (max != i) {
-    // temp = root
     let temp = array[i];
-    // set last element = max
     array[i] = array[max];
-    // set max to root
     array[max] = temp;
 
-    // recursively heapify the affected sub-tree because the root has been changed
+    visualizeStep(array, `Swapped parent index ${i} with child index ${max}.`, "swap", max);
+
     heapify(array, size, max);
   }
+}
+
+function formatParentChild(parentIndex, childIndex) {
+  return `Parent index ${parentIndex} with value ${array[parentIndex]} has child index ${childIndex} with value ${array[childIndex]}`;
 }
 
 function handleArrayInput() {
@@ -94,7 +154,7 @@ function handleArrayInput() {
     return;
   }
 
-  arr.splice(0, arr.length, ...newArray);
+  array.splice(0, array.length, ...newArray);
   originalArray.splice(0, originalArray.length, ...newArray);
   countArr = new Array(Math.max(...newArray) + 1).fill(0);
 
@@ -107,21 +167,25 @@ function handleArrayInput() {
   //   displayArrayAsBoxes(newArray, "originalArrayDisplay");
 }
 
-async function handleStartClicked(arr) {
-  await heapSort(arr);
+console.log(array);
+
+async function handleStartClicked() {
+  console.log(array);
+
+  await heapSort(array);
 }
 
 function handleResetClicked() {
   resetFlag = true;
 
-  arr.splice(0, arr.length, ...originalArray);
+  array.splice(0, array.length, ...originalArray);
 
   countArr = new Array(Math.max(...originalArray) + 1).fill(0);
 
   clearDisplays();
 
   // TODO: display as tree/heap
-  //   displayArrayAsBars(originalArray, "arrayDisplay");
+  displayArrayAsBars(originalArray, "arrayDisplay");
   //   displayArrayAsBoxes(countArr, "countingArrayDisplay");
   //   displayIndexLabels(countArr.length, "countingArrayIndexDisplay");
 }
@@ -136,18 +200,12 @@ function visualizeStep(array, message, type, highlightIndex) {
   if (resetFlag) return;
 
   displayArrayAsBars(array, "arrayDisplay");
-  displayAsTree(array, "treeDisplay");
-  //   if (type === "counting") {
-  //     displayArrayAsBoxes(array, "countingArrayDisplay", highlightIndex);
-  //     displayIndexLabels(array.length, "countingArrayIndexDisplay");
-  //   } else if (type === "sorting") {
-  //     displayArrayAsBars(array, "arrayDisplay", highlightIndex);
-  //   } else if (type === "originalCounting") {
-  //     displayArrayAsBars(array, "arrayDisplay", highlightIndex);
-  //   } else if (type === "original") {
-  //     displayArrayAsBars(array, "arrayDisplay", -1);
-  //   }
-  document.getElementById("steps").innerHTML = message;
+  if (type === "heapify" || type === "swap") {
+    displayArrayAsBars(array, "arrayDisplay", highlightIndex);
+    displayIndexLabels(array.length, "indexCounterDisplay");
+  }
+
+  document.getElementById("stepsTaken").innerHTML = message;
 }
 
 function clearContainer(containerId) {
@@ -158,7 +216,7 @@ function clearContainer(containerId) {
 
 function clearDisplays() {
   document.getElementById("arrayDisplay").innerHTML = "";
-  document.getElementById("steps").innerHTML = "";
+  document.getElementById("stepsTaken").innerHTML = "";
 }
 
 // function displayAsBars(array, containerId) {
@@ -182,6 +240,7 @@ function displayArrayAsBars(array, containerId, highlightIndex) {
     bar.style.height = `${value * 20}px`;
     bar.style.backgroundColor = index === highlightIndex ? "#FF4949" : "#2e63e9";
 
+    // Size of bars label
     const label = document.createElement("label");
     label.classList.add("bar-label");
     label.innerHTML = value;
@@ -189,4 +248,32 @@ function displayArrayAsBars(array, containerId, highlightIndex) {
 
     barContainer.appendChild(bar);
   });
+}
+
+function displayArrayAsBoxes(array, containerId, highlightIndex) {
+  const boxContainer = clearContainer(containerId);
+
+  array.forEach((value, index) => {
+    const box = document.createElement("div");
+    box.classList.add("box");
+    box.style.backgroundColor = index === highlightIndex ? "#FF4949" : "#f0f0f0";
+
+    const label = document.createElement("label");
+    label.classList.add("box-label");
+    label.innerHTML = value;
+    box.appendChild(label);
+
+    boxContainer.appendChild(box);
+  });
+}
+
+function displayIndexLabels(length, containerId) {
+  const indexContainer = clearContainer(containerId);
+
+  for (let i = 0; i < length; i++) {
+    const indexLabel = document.createElement("div");
+    indexLabel.classList.add("index-label");
+    indexLabel.innerHTML = i;
+    indexContainer.appendChild(indexLabel);
+  }
 }
