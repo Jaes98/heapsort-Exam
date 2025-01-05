@@ -4,9 +4,6 @@ const array = [1, 4, 1, 2, 7, 5, 2, 4, 8];
 const originalArray = [...array];
 let delayValue = document.getElementById("speedSlider").value;
 
-let steps = [];
-let currentStep = 0;
-
 const max = Math.max(...array);
 let countArr = Array(max + 1).fill(0);
 
@@ -68,12 +65,16 @@ function start() {
 // }
 
 async function heapSort(array) {
+  resetFlag = false;
+
   let size = array.length;
   console.log(size);
 
   console.log("Heap sort started");
 
   for (let i = Math.floor(size / 2 - 1); i >= 0; i--) {
+    if (resetFlag) return;
+
     visualizeStep(array, `Heapify at index ${i}`, "heapify", [i]);
     heapify(array, size, i);
     await delayDuration(delayValue);
