@@ -2,11 +2,10 @@ window.addEventListener("load", start);
 
 const array = [3, 5, 12, 5, 6, 11, 8, 10, 13, 2];
 const originalArray = [...array];
+const max = Math.max(...array);
 
 // Speedslider delay
 let delayValue = document.getElementById("speedSlider").value;
-
-const max = Math.max(...array);
 
 // Reset flag to stop the sorting algorithm
 let resetFlag = false;
@@ -25,7 +24,7 @@ function start() {
   const speedSlider = document.getElementById("speedSlider");
   const speedValue = document.getElementById("speedValue");
 
-  submitArrayButton.addEventListener("click", handleArrayInput);
+  submitArrayButton.addEventListener("click", handleUserArrayInput);
   startButton.addEventListener("click", handleStartClicked);
   pause_button.addEventListener("click", handlePauseClicked);
   resume_button.addEventListener("click", handleResumeClicked);
@@ -48,13 +47,11 @@ async function heapSort(array) {
 
   let size = array.length;
 
-  //
   for (let i = Math.floor(size / 2 - 1); i >= 0; i--) {
     if (resetFlag) return;
 
     visualizeStep(array, `Building heap at index [${i}]`, "heapify", [i]);
     await delayDuration(delayValue);
-    console.log(i);
     await heapify(array, size, i);
   }
 
@@ -67,7 +64,7 @@ async function heapSort(array) {
     // set the last element as the largest
     array[i] = temp;
 
-    visualizeStep(array, `Swapped parent at index [0] with child index at index [${i}].`, "swap", [0, i]);
+    visualizeStep(array, `Swapped parent at index [0] with child at index [${i}].`, "swap", [0, i]);
     await delayDuration(delayValue);
 
     visualizeStep(array, `Heapifying root at index [${i}]`, "heapify", [0, 2 * 0 + 1, 2 * 0 + 2]);
@@ -119,9 +116,9 @@ async function heapify(array, size, i) {
   }
 }
 
-function handleArrayInput() {
-  const arrayInput = document.getElementById("arrayInput").value;
-  const newArray = arrayInput.split(",").map(Number);
+function handleUserArrayInput() {
+  const userArrayInput = document.getElementById("userArrayInput").value;
+  const newArray = userArrayInput.split(",").map(Number);
 
   if (newArray.some(isNaN)) {
     alert("Please enter a valid array of numbers separated by commas.");
@@ -136,10 +133,7 @@ function handleArrayInput() {
   displayArrayAsBars(newArray, "arrayDisplay");
 }
 
-console.log(array);
-
 async function handleStartClicked() {
-  console.log(array);
   document.getElementById("status").innerHTML = "Program status: Running";
   await heapSort(array);
 }
@@ -185,6 +179,7 @@ async function visualizeStep(array, message, type, highlightIndex = []) {
   displayArrayAsBars(array, "arrayDisplay", highlightIndex, type);
   document.getElementById("stepsTaken").innerHTML = message;
 
+  // For displaying steps taken in console, since they disappear in UI
   console.log(message);
 }
 
@@ -224,11 +219,13 @@ function displayArrayAsBars(array, containerId, highlightIndex = [], type = null
       bar.style.backgroundColor = "#2e63e9"; // Default bar color
     }
 
+    // array label
     const label = document.createElement("label");
     label.classList.add("bar-label");
     label.innerHTML = value;
     bar.appendChild(label);
 
+    // append index label to bar
     const indexLabel = document.createElement("label");
     indexLabel.classList.add("bar-index-label");
     indexLabel.innerHTML = index;
@@ -238,6 +235,7 @@ function displayArrayAsBars(array, containerId, highlightIndex = [], type = null
   });
 }
 
+// Original array displayed as boxes
 function displayArrayAsBoxes(array, containerId, highlightIndex) {
   const boxContainer = clearContainer(containerId);
 
@@ -253,17 +251,4 @@ function displayArrayAsBoxes(array, containerId, highlightIndex) {
 
     boxContainer.appendChild(box);
   });
-}
-
-function displayIndexLabels(length, containerId) {
-  const indexContainer = clearContainer(containerId);
-
-  for (let i = 0; i < length; i++) {
-    const indexLabel = document.createElement("div");
-
-    indexLabel.classList.add("index-label");
-    indexLabel.innerHTML = i;
-
-    indexContainer.appendChild(indexLabel);
-  }
 }
