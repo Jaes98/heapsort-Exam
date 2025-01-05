@@ -23,7 +23,9 @@ function start() {
   resetButton.addEventListener("click", handleResetClicked);
 
   speedSlider.addEventListener("input", function () {
-    delayValue = this.value;
+    // Update the delay value between each step of the sorting algorithm
+    // Delay value is inverted to match the intuitive feel of the slider
+    delayValue = speedSlider.max - (this.value - speedSlider.min);
     speedValue.textContent = `Animation speed (ms): ${delayValue}`;
   });
 
