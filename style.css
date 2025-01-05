@@ -134,3 +134,44 @@ button:hover {
   margin-right: 4px;
   margin-top: 4px;
 }
+
+/* Highlight Colors */
+
+/* Swap Highlights */
+.swap-from {
+  background-color: #ff4949; /* Red for element being swapped from */
+}
+
+.swap-to {
+  background-color: #00ff00; /* Green for element being swapped to */
+}
+
+/* Heapify Highlights */
+.heapify-parent {
+  background-color: #ffa500; /* Orange for parent node */
+}
+
+.heapify-child {
+  background-color: #ffd700; /* Gold for child node */
+}
+
+/* Compare Highlights */
+.compare {
+  background-color: #0000ff; /* Blue for comparison */
+}
+
+/* Default Bar Style */
+.bar {
+  position: relative;
+  margin: 2px;
+  width: 30px;
+  display: inline-flex;
+  justify-content: center;
+  padding: 2px;
+  background-color: #2e63e9; /* Default bar color */
+  transition: background-color 0.3s;
+}
+
+.sorted {
+  background-color: #32cd32; /* LimeGreen for sorted elements */
+}

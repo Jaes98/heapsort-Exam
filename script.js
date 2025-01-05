@@ -4,6 +4,9 @@ const array = [1, 4, 1, 2, 7, 5, 2, 4, 8];
 const originalArray = [...array];
 let delayValue = document.getElementById("speedSlider").value;
 
+let steps = [];
+let currentStep = 0;
+
 const max = Math.max(...array);
 let countArr = Array(max + 1).fill(0);
 
@@ -71,7 +74,7 @@ async function heapSort(array) {
   console.log("Heap sort started");
 
   for (let i = Math.floor(size / 2 - 1); i >= 0; i--) {
-    visualizeStep(array, `Heapify at index ${i}`, "heapify", i, formatParentChild(i, 2 * i + 1), formatParentChild(i, 2 * i + 2));
+    visualizeStep(array, `Heapify at index ${i}`, "heapify", [i]);
     heapify(array, size, i);
     await delayDuration(delayValue);
   }
@@ -80,10 +83,10 @@ async function heapSort(array) {
     let temp = array[0];
     array[0] = array[i];
     array[i] = temp;
-    visualizeStep(array, `Swapped parent index 0 [root node] with child index ${i}.`, "swap", i);
+    visualizeStep(array, `Swapped parent index 0 [root node] with child index ${i}.`, "swap", [0, i]);
     await delayDuration(delayValue);
 
-    visualizeStep(array, `Heapify root ${i}`, "heapify", i, formatParentChild(0, 2 * 0 + 1), formatParentChild(0, 2 * 0 + 2));
+    visualizeStep(array, `Heapify root ${i}`, "heapify", [0, 2 * 0 + 1, 2 * 0 + 2]);
     heapify(array, i, 0);
     await delayDuration(delayValue);
   }
@@ -122,12 +125,12 @@ function heapify(array, size, i) {
 
   if (left < size && array[left] > array[max]) {
     max = left;
-    visualizeStep(array, `Left child ${left} is greater than parent ${i}.`, "compare", left);
+    visualizeStep(array, `Left child ${left} is greater than parent ${i}.`, "compare", [left]);
   }
 
   if (right < size && array[right] > array[max]) {
     max = right;
-    visualizeStep(array, `Right child ${right} is greater than parent ${i}.`, "compare", right);
+    visualizeStep(array, `Right child ${right} is greater than parent ${i}.`, "compare", [right]);
   }
 
   if (max != i) {
@@ -135,7 +138,7 @@ function heapify(array, size, i) {
     array[i] = array[max];
     array[max] = temp;
 
-    visualizeStep(array, `Swapped parent index ${i} with child index ${max}.`, "swap", max);
+    visualizeStep(array, `Swapped parent index ${i} with child index ${max}.`, "swap", [i, max]);
 
     heapify(array, size, max);
   }
@@ -195,13 +198,11 @@ function delayDuration(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// TODO display as tree/heap
-function visualizeStep(array, message, type, highlightIndex) {
+function visualizeStep(array, message, type, highlightIndices = []) {
   if (resetFlag) return;
 
-  displayArrayAsBars(array, "arrayDisplay");
+  displayArrayAsBars(array, "arrayDisplay", highlightIndices, type);
   if (type === "heapify" || type === "swap") {
-    displayArrayAsBars(array, "arrayDisplay", highlightIndex);
     displayIndexLabels(array.length, "indexCounterDisplay");
   }
 
@@ -231,16 +232,30 @@ function clearDisplays() {
 //   });
 // }
 
-function displayArrayAsBars(array, containerId, highlightIndex) {
+function displayArrayAsBars(array, containerId, highlightIndices = [], type = null) {
   const barContainer = clearContainer(containerId);
 
   array.forEach((value, index) => {
     const bar = document.createElement("div");
     bar.classList.add("bar");
     bar.style.height = `${value * 20}px`;
-    bar.style.backgroundColor = index === highlightIndex ? "#FF4949" : "#2e63e9";
 
-    // Size of bars label
+    if (highlightIndices.includes(index)) {
+      let color = "#FF4949"; // Default highlight color
+
+      if (type === "swap") {
+        // Assign red to the first index and green to the second index being swapped
+        const swapIndex = highlightIndices.indexOf(index);
+        color = swapIndex === 0 ? "#FF4949" : "#00FF00"; // Red and Green
+      } else if (type === "compare") {
+        color = "#0000FF"; // Blue for comparison
+      }
+
+      bar.style.backgroundColor = color;
+    } else {
+      bar.style.backgroundColor = "#2e63e9"; // Default bar color
+    }
+
     const label = document.createElement("label");
     label.classList.add("bar-label");
     label.innerHTML = value;
