@@ -2,20 +2,21 @@ window.addEventListener("load", start);
 
 const array = [3, 5, 12, 5, 6, 11, 8, 10, 13, 2];
 const originalArray = [...array];
+
+// Speedslider delay
 let delayValue = document.getElementById("speedSlider").value;
 
 const max = Math.max(...array);
-let countArr = Array(max + 1).fill(0);
 
+// Reset flag to stop the sorting algorithm
 let resetFlag = false;
 
+// Global pause and resume variables
 let isPaused = false;
 let resumePromise;
 let resumeFunction;
 
 function start() {
-  console.log("JS running");
-
   const submitArrayButton = document.getElementById("submitArrayButton");
   const startButton = document.getElementById("start_button");
   const pause_button = document.getElementById("pause_button");
@@ -47,11 +48,13 @@ async function heapSort(array) {
 
   let size = array.length;
 
+  //
   for (let i = Math.floor(size / 2 - 1); i >= 0; i--) {
     if (resetFlag) return;
 
     visualizeStep(array, `Building heap at index [${i}]`, "heapify", [i]);
     await delayDuration(delayValue);
+    console.log(i);
     await heapify(array, size, i);
   }
 
@@ -127,7 +130,6 @@ function handleArrayInput() {
 
   array.splice(0, array.length, ...newArray);
   originalArray.splice(0, originalArray.length, ...newArray);
-  countArr = new Array(Math.max(...newArray) + 1).fill(0);
 
   clearDisplays();
 
@@ -159,8 +161,6 @@ function handleResetClicked() {
   document.getElementById("status").innerHTML = "Program status: Not running";
 
   array.splice(0, array.length, ...originalArray);
-
-  countArr = new Array(Math.max(...originalArray) + 1).fill(0);
 
   clearDisplays();
 
