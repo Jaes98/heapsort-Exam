@@ -64,6 +64,18 @@ button:hover {
   transition: background-color 0.3s, transform 0.3s;
 }
 
+#pause_button {
+  background-color: #969696;
+  color: white;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+#resume_button {
+  background-color: rgba(76, 179, 202, 0.998);
+  color: white;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
 #arrayContainer {
   justify-content: center;
   text-align: center;
