@@ -116,10 +116,6 @@ async function heapify(array, size, i) {
   }
 }
 
-function formatParentChild(parentIndex, childIndex) {
-  return `Parent index ${parentIndex} with value ${array[parentIndex]} has child index ${childIndex} with value ${array[childIndex]}`;
-}
-
 function handleArrayInput() {
   const arrayInput = document.getElementById("arrayInput").value;
   const newArray = arrayInput.split(",").map(Number);
@@ -182,8 +178,9 @@ function pauseExecution() {
   });
 }
 
-function visualizeStep(array, message, type, highlightIndex = []) {
+async function visualizeStep(array, message, type, highlightIndex = []) {
   if (resetFlag) return;
+  if (isPaused) await pauseExecution();
 
   displayArrayAsBars(array, "arrayDisplay", highlightIndex, type);
   document.getElementById("stepsTaken").innerHTML = message;
